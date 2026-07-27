@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIAGEO | Sistema de Mapeamento e Documentação de Rede FTTH</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: { 
+            brand: { 
+              black: '#07090E', 
+              darkCard: '#111622', 
+              blue: '#2563EB',
+              blueLight: '#3B82F6',
+              cyan: '#06B6D4'
+            } 
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .bg-grid-pattern {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(37, 99, 235, 0.07) 1px, transparent 1px), 
+        linear-gradient(to bottom, rgba(37, 99, 235, 0.07) 1px, transparent 1px);
+    }
+    .glow-blue {
+      box-shadow: 0 0 30px rgba(37, 99, 235, 0.25);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased bg-brand-black text-gray-100 flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-brand-black/90 backdrop-blur-md border-b border-white/10 py-3.5 px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-extrabold text-lg">
+          <i data-lucide="map-pin" class="w-5 h-5"></i>
+        </div>
+        <span class="font-heading font-extrabold text-xl tracking-tight text-white">WIA<span class="text-cyan-400">GEO</span></span>
+      </a>
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
+        <a href="#recursos" class="hover:text-cyan-400 transition-colors">Recursos</a>
+        <a href="#demo" class="hover:text-cyan-400 transition-colors">Demonstração</a>
+        <a href="#planos" class="hover:text-cyan-400 transition-colors">Planos & Preços</a>
+        <a href="#faq" class="hover:text-cyan-400 transition-colors">FAQ</a>
+      </nav>
+      <a href="https://wiageo.base44.app/" target="_blank" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+        Acessar Sistema
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="pt-36 pb-16 px-6 bg-grid-pattern relative overflow-hidden">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Texto Hero -->
+      <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-sm">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> GEOLOCALIZAÇÃO & FTTH
+        </div>
+        <h1 class="font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-tight">
+          Documentação de Rede Óptica <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Simplificada</span>
+        </h1>
+        <p class="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+          Gerencie CTOs, CEOs, Cabos, POPs e OLTs em um mapa interativo de alta precisão. Agilize consultas de viabilidade técnica para novos clientes e reduza o tempo de atendimento do seu ISP.
+        </p>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+          <a href="#planos" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)]">
+            Contratar Agora <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+          <a href="https://wiageo.base44.app/" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold text-sm px-6 py-3.5 rounded-xl border border-white/10 transition-all">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Ver Demonstração
+          </a>
+        </div>
+
+        <!-- Destaques Rápido -->
+        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-white/10 text-left">
+          <div>
+            <span class="block text-xl font-bold text-white font-heading">100% Web</span>
+            <span class="text-xs text-gray-400">Acesso via navegador</span>
+          </div>
+          <div>
+            <span class="block text-xl font-bold text-cyan-400 font-heading">R$ 99,90</span>
+            <span class="text-xs text-gray-400">Mensalidade fixa</span>
+          </div>
+          <div>
+            <span class="block text-xl font-bold text-white font-heading">Viabilidade</span>
+            <span class="text-xs text-gray-400">Consulta por endereço</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Interativo / Iframe -->
+      <div class="lg:col-span-6 relative" id="demo">
+        <div class="relative bg-brand-darkCard border border-white/15 rounded-2xl p-2 glow-blue shadow-2xl overflow-hidden">
+          
+          <!-- Bar do Navegador -->
+          <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/40 rounded-t-xl mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-lg px-4 py-1 text-xs font-mono text-gray-400 flex items-center gap-2 w-2/3 justify-center">
+              <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i> https://wiageo.base44.app
+            </div>
+            <a href="https://wiageo.base44.app/" target="_blank" class="text-xs text-cyan-400 hover:underline flex items-center gap-1">
+              Abrir <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+
+          <!-- Container Iframe do Sistema -->
+          <div class="w-full h-[420px] sm:h-[480px] rounded-b-xl overflow-hidden relative">
+            <iframe 
+              src="https://wiageo.base44.app/" 
+              title="WIAGEO - Sistema de Mapeamento FTTH" 
+              class="w-full h-full border-0"
+              loading="lazy">
+            </iframe>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RECURSOS DO SISTEMA -->
+  <section id="recursos" class="py-20 px-6 bg-brand-black border-t border-white/5">
+    <div class="max-w-7xl mx-auto space-y-12">
+      
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <h2 class="font-heading font-bold text-3xl sm:text-4xl text-white">Tudo o que seu ISP precisa para mapear a rede</h2>
+        <p class="text-gray-400 text-sm sm:text-base">Controle total da sua infraestrutura física de telecomunicações em um único mapa interativo.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Card 1 -->
+        <div class="bg-brand-darkCard border border-white/10 p-6 rounded-2xl hover:border-cyan-500/50 transition-all space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <i data-lucide="box" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-bold text-lg text-white">Gestão de CTOs e CEOs</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Cadastre caixas de terminação e emenda com geolocalização exata, capacidade de portas e ocupação de clientes.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-brand-darkCard border border-white/10 p-6 rounded-2xl hover:border-cyan-500/50 transition-all space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <i data-lucide="search" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-bold text-lg text-white">Consulta de Viabilidade</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Digite o endereço do cliente no mapa e identifique instantaneamente as CTOs mais próximas com portas disponíveis.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-brand-darkCard border border-white/10 p-6 rounded-2xl hover:border-cyan-500/50 transition-all space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <i data-lucide="git-commit" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-bold text-lg text-white">Mapeamento de Cabos & POPs</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Desenhe rotas de cabos ópticos, defina capacidade de fibras e organize POPs e centrais de distribuição.</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="bg-brand-darkCard border border-white/10 p-6 rounded-2xl hover:border-cyan-500/50 transition-all space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <i data-lucide="activity" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-bold text-lg text-white">Dashboard de Métricas</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Visualize quantidade de CTOs ativas, áreas de cobertura mapeadas e total de clientes conectados em tempo real.</p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="bg-brand-darkCard border border-white/10 p-6 rounded-2xl hover:border-cyan-500/50 transition-all space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <i data-lucide="wifi" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-bold text-lg text-white">Controle de OLTs</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Associe suas caixas e cabos diretamente aos equipamentos OLT da sua central para fácil rastreabilidade.</p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="bg-brand-darkCard border border-white/10 p-6 rounded-2xl hover:border-cyan-500/50 transition-all space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-heading font-bold text-lg text-white">Pronto para Equipes Externas</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Acesse o sistema direto do celular ou tablet em campo pelos técnicos durante instalações e reparos.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PLANOS E VALORES -->
+  <section id="planos" class="py-20 px-6 bg-grid-pattern relative">
+    <div class="max-w-4xl mx-auto space-y-10">
+      
+      <div class="text-center space-y-3">
+        <span class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">Investimento Transparente</span>
+        <h2 class="font-heading font-extrabold text-3xl sm:text-5xl text-white">Planos sem surpresas no fim do mês</h2>
+        <p class="text-gray-400 text-sm">Implantação guiada e suporte dedicado para colocar sua rede no mapa rapidamente.</p>
+      </div>
+
+      <!-- Card de Preço Principal -->
+      <div class="bg-brand-darkCard border-2 border-cyan-500/60 rounded-3xl p-8 sm:p-10 shadow-[0_0_40px_rgba(6,182,212,0.15)] relative overflow-hidden">
+        <div class="absolute top-0 right-0 bg-cyan-500 text-slate-950 font-bold text-[10px] font-mono px-4 py-1.5 rounded-bl-xl uppercase tracking-wider">
+          Plano Completo
+        </div>
+
+        <div class="grid md:grid-cols-12 gap-8 items-center">
+          
+          <div class="md:col-span-7 space-y-6">
+            <div>
+              <h3 class="font-heading font-bold text-2xl text-white">WIAGEO Licença ISP</h3>
+              <p class="text-xs text-gray-400 mt-1">Acesso irrestrito a todas as funcionalidades do sistema.</p>
+            </div>
+
+            <ul class="space-y-3 text-xs text-gray-300">
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400 shrink-0"></i> Mapeamento ilimitado de CTOs, CEOs e Cabos
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400 shrink-0"></i> Módulo de Consulta de Viabilidade Técnica
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400 shrink-0"></i> Acesso ilimitado de usuários e técnicos
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400 shrink-0"></i> Suporte técnico e atualizações incluídas
+              </li>
+            </ul>
+
+            <!-- Detalhe da Implantação -->
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
+              <div class="text-xs font-bold text-gray-200 flex items-center justify-between">
+                <span>Taxa de Implantação e Configuração:</span>
+                <span class="text-cyan-400 font-mono text-sm">R$ 500,00</span>
+              </div>
+              <p class="text-[11px] text-gray-400">
+                Pode ser parcelada em até <strong class="text-white">3x no boleto bancário</strong> (R$ 166,66/mês).
+              </p>
+            </div>
+          </div>
+
+          <!-- Coluna Preço -->
+          <div class="md:col-span-5 bg-black/40 border border-white/10 rounded-2xl p-6 text-center space-y-6">
+            <div>
+              <span class="text-xs text-gray-400 block font-mono">Mensalidade</span>
+              <div class="flex items-baseline justify-center gap-1 mt-2">
+                <span class="text-lg text-gray-400 font-bold">R$</span>
+                <span class="font-heading font-extrabold text-5xl text-white">99</span>
+                <span class="text-lg text-gray-300 font-bold">,90</span>
+                <span class="text-xs text-gray-400">/mês</span>
+              </div>
+            </div>
+
+            <a href="https://wa.me/5551989019193?text=Ol%C3%A1%2C+tenho+interesse+no+sistema+WIAGEO+para+meu+provedor." target="_blank" class="w-full inline-flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs py-3.5 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+              Contratar WIAGEO <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+
+            <span class="text-[10px] text-gray-500 block">Sem fidelidade. Cancele quando quiser.</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-16 px-6 bg-brand-black border-t border-white/5">
+    <div class="max-w-3xl mx-auto space-y-8">
+      <div class="text-center space-y-2">
+        <h2 class="font-heading font-bold text-2xl sm:text-3xl text-white">Dúvidas Frequentes</h2>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm">
+        <div class="bg-brand-darkCard border border-white/10 rounded-xl p-5 space-y-2">
+          <h4 class="font-bold text-white">Como funciona o parcelamento da implantação?</h4>
+          <p class="text-gray-400 leading-relaxed">A taxa de implantação de R$ 500,00 pode ser paga à vista ou parcelada em até 3x de R$ 166,66 emitidos no boleto junto com as primeiras mensalidades.</p>
+        </div>
+
+        <div class="bg-brand-darkCard border border-white/10 rounded-xl p-5 space-y-2">
+          <h4 class="font-bold text-white">Preciso instalar algum programa no computador?</h4>
+          <p class="text-gray-400 leading-relaxed">Não. O WIAGEO é 100% online (SaaS) e pode ser acessado diretamente do navegador em computadores, notebooks, tablets e smartphones.</p>
+        </div>
+
+        <div class="bg-brand-darkCard border border-white/10 rounded-xl p-5 space-y-2">
+          <h4 class="font-bold text-white">Como faço para migrar meus dados para o WIAGEO?</h4>
+          <p class="text-gray-400 leading-relaxed">Na etapa de implantação, nossa equipe orienta seu time para o cadastramento inicial dos pontos e dados da sua rede.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="py-12 px-6 bg-brand-black">
+    <div class="max-w-7xl mx-auto bg-gradient-to-r from-cyan-950/60 to-slate-900 border border-cyan-500/30 rounded-3xl p-10 text-center relative overflow-hidden">
+      <div class="relative z-10 max-w-2xl mx-auto space-y-4">
+        <h2 class="font-heading font-bold text-2xl sm:text-4xl text-white">Pronto para organizar a rede do seu provedor?</h2>
+        <p class="text-gray-300 text-xs sm:text-sm">
+          Fale com um de nossos especialistas e comece o mapeamento da sua infraestrutura hoje mesmo.
+        </p>
+        <div class="pt-4 flex flex-wrap justify-center gap-4">
+          <a href="https://wa.me/5551989019193?text=Ol%C3%A1%2C+quero+agendar+uma+demonstra%C3%A7%C3%A3o+do+WIAGEO" target="_blank" class="inline-flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all">
+            Falar no WhatsApp <i data-lucide="message-square" class="w-4 h-4"></i>
+          </a>
+          <a href="https://wiageo.base44.app/" target="_blank" class="inline-flex items-center gap-2 bg-transparent hover:bg-white/5 text-white font-bold text-xs px-6 py-3.5 rounded-xl border border-white/20 transition-all">
+            Acessar Sistema
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-white/10 pt-12 pb-8 px-6 text-gray-400 text-sm mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
+      <div class="flex items-center gap-3">
+        <a href="/" class="inline-block">
+          <img src="https://i.ibb.co/0ph5hPJL/logo-wiadigital-12.png" alt="WiaDigital" class="h-8 w-auto">
+        </a>
+        <span class="text-gray-600">|</span>
+        <span class="text-gray-400">WIAGEO — Mapeamento & FTTH</span>
+      </div>
+      <p>© 2026 WiaDigital. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Inicializar ícones Lucide
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
