@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-slate-950">
+<html lang="pt-BR" class="h-full bg-slate-100">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WiaGeo | Mapeamento & Documentação FTTH</title>
+  <title>WIAGEO - Mapa da Rede</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,10 +15,10 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Fonte Google Fonts: Inter & Plus Jakarta Sans -->
+  <!-- Fonte Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -26,16 +26,15 @@
         extend: {
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            heading: ['Plus Jakarta Sans', 'sans-serif'],
           },
           colors: {
             brand: {
-              black: '#07090E',
-              dark: '#0D111A',
-              card: '#111622',
-              cyan: '#06B6D4',
-              cyanLight: '#22D3EE',
-              blue: '#2563EB'
+              teal: '#00C49F',
+              tealLight: '#E0F7F6',
+              dark: '#1E293B',
+              bg: '#F8FAFC',
+              sidebar: '#FFFFFF',
+              border: '#E2E8F0'
             }
           }
         }
@@ -44,383 +43,368 @@
   </script>
 
   <style>
-    /* Estilização Customizada do Leaflet */
+    /* Customização do Mapa Leaflet para o Modo Light */
     .leaflet-container {
-      background-color: #07090e !important;
+      background-color: #f8fafc !important;
       font-family: 'Inter', sans-serif;
     }
     .leaflet-popup-content-wrapper {
-      background: #111622 !important;
-      color: #F3F4F6 !important;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      background: #ffffff !important;
+      color: #1e293b !important;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
     }
-    .leaflet-popup-tip {
-      background: #111622 !important;
-    }
-    .custom-marker {
+    
+    /* Pin Redondo Personalizado (Estilo da Imagem) */
+    .custom-node-pin {
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       color: white;
-      font-weight: bold;
-      box-shadow: 0 0 12px rgba(0,0,0,0.6);
-      border: 2px solid rgba(255,255,255,0.8);
+      font-weight: 700;
+      font-size: 10px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+      border: 2px solid #ffffff;
+      transition: transform 0.2s ease;
+    }
+    .custom-node-pin:hover {
+      transform: scale(1.15);
+      cursor: pointer;
+    }
+    
+    /* Custom Scrollbar Suave */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
     }
   </style>
 </head>
-<body class="h-full text-gray-100 flex flex-col font-sans overflow-hidden bg-brand-black">
+<body class="h-full text-slate-800 flex bg-slate-100 font-sans overflow-hidden">
 
-  <!-- HEADER / BARRA SUPERIOR -->
-  <header class="h-14 bg-brand-dark border-b border-white/10 px-4 flex items-center justify-between shrink-0 z-30">
-    <div class="flex items-center gap-6">
-      <a href="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+  <!-- SIDEBAR ESQUERDA (ESTILO EXATO DA IMAGEM) -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 z-30 transition-all duration-300">
+    <div>
+      <!-- LOGO WIAGEO -->
+      <div class="h-16 px-6 flex items-center gap-3 border-b border-slate-100">
+        <div class="w-9 h-9 rounded-xl bg-teal-400 flex items-center justify-center text-white font-bold shadow-sm">
           <i data-lucide="map-pin" class="w-5 h-5"></i>
         </div>
-        <span class="font-heading font-extrabold text-lg text-white tracking-wide">WIA<span class="text-cyan-400">GEO</span></span>
-      </a>
-
-      <!-- Seletor de Projeto / Cidade -->
-      <div class="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs">
-        <i data-lucide="network" class="w-4 h-4 text-cyan-400"></i>
-        <span class="text-gray-400">Rede Principal:</span>
-        <select class="bg-transparent text-white font-medium focus:outline-none cursor-pointer">
-          <option value="pop-central" class="bg-brand-dark">POP Central - Viamão</option>
-          <option value="pop-zona-norte" class="bg-brand-dark">POP Zona Norte - Porto Alegre</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Status da Rede & Usuário -->
-    <div class="flex items-center gap-4">
-      <div class="hidden md:flex items-center gap-6 text-xs border-r border-white/10 pr-4">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-gray-300 font-medium">42 CTOs Ativas</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
-          <span class="text-gray-300 font-medium">18.4 km de Fibra</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-          <span class="text-gray-300 font-medium">82% Ocupação</span>
-        </div>
+        <span class="font-extrabold text-xl text-slate-800 tracking-tight">WIAGEO</span>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button class="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all relative">
-          <i data-lucide="bell" class="w-4 h-4"></i>
-          <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-cyan-400"></span>
-        </button>
-        <div class="w-8 h-8 rounded-full bg-cyan-600/30 border border-cyan-500/50 flex items-center justify-center font-bold text-xs text-cyan-300">
-          AD
-        </div>
-      </div>
-    </div>
-  </header>
+      <!-- NAV MENU SANFONADO -->
+      <nav class="p-4 space-y-1 text-sm font-medium">
+        
+        <!-- Item Ativo (Mapa da Rede) -->
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-teal-600 bg-teal-50/80 font-semibold transition-all">
+          <i data-lucide="map" class="w-5 h-5"></i>
+          <span>Mapa da Rede</span>
+        </a>
 
-  <!-- CORPO PRINCIPAL (SIDEBAR + MAPA) -->
-  <div class="flex-grow flex relative overflow-hidden">
-
-    <!-- BARRA LATERAL (FERRAMENTAS FTTH) -->
-    <aside class="w-80 bg-brand-dark border-r border-white/10 flex flex-col shrink-0 z-20 transition-all duration-300" id="sidebar">
-      <!-- Navegação das Abas da Sidebar -->
-      <div class="grid grid-cols-3 border-b border-white/10 text-xs font-semibold text-gray-400 bg-black/20">
-        <button onclick="switchTab('add')" id="tab-add" class="py-3 text-cyan-400 border-b-2 border-cyan-400 flex items-center justify-center gap-1.5">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i> Add
-        </button>
-        <button onclick="switchTab('layers')" id="tab-layers" class="py-3 hover:text-white border-b-2 border-transparent flex items-center justify-center gap-1.5">
-          <i data-lucide="layers" class="w-4 h-4"></i> Camadas
-        </button>
-        <button onclick="switchTab('viability')" id="tab-viability" class="py-3 hover:text-white border-b-2 border-transparent flex items-center justify-center gap-1.5">
-          <i data-lucide="search" class="w-4 h-4"></i> Viabilidade
-        </button>
-      </div>
-
-      <!-- Conteúdo da Aba 1: Adicionar Elementos de Rede -->
-      <div id="content-add" class="p-4 space-y-4 overflow-y-auto flex-grow">
-        <p class="text-xs text-gray-400 font-medium">Selecione um elemento e clique no mapa para posicionar:</p>
-
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="setAddMode('CTO')" id="btn-CTO" class="tool-btn bg-white/5 hover:bg-cyan-950/40 border border-white/10 hover:border-cyan-500/50 p-3 rounded-xl flex flex-col items-center gap-2 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
-              <i data-lucide="box" class="w-4 h-4"></i>
+        <!-- Item OLTs -->
+        <div class="group">
+          <button onclick="toggleSubmenu('sub-olt')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="radio" class="w-5 h-5"></i>
+              <span>OLTs</span>
             </div>
-            <span class="text-xs font-semibold text-gray-200">Caixa CTO</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
           </button>
-
-          <button onclick="setAddMode('CEO')" id="btn-CEO" class="tool-btn bg-white/5 hover:bg-emerald-950/40 border border-white/10 hover:border-emerald-500/50 p-3 rounded-xl flex flex-col items-center gap-2 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <i data-lucide="archive" class="w-4 h-4"></i>
-            </div>
-            <span class="text-xs font-semibold text-gray-200">Caixa CEO</span>
-          </button>
-
-          <button onclick="setAddMode('POP')" id="btn-POP" class="tool-btn bg-white/5 hover:bg-purple-950/40 border border-white/10 hover:border-purple-500/50 p-3 rounded-xl flex flex-col items-center gap-2 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
-              <i data-lucide="server" class="w-4 h-4"></i>
-            </div>
-            <span class="text-xs font-semibold text-gray-200">POP / Central</span>
-          </button>
-
-          <button onclick="setAddMode('CABLE')" id="btn-CABLE" class="tool-btn bg-white/5 hover:bg-blue-950/40 border border-white/10 hover:border-blue-500/50 p-3 rounded-xl flex flex-col items-center gap-2 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
-              <i data-lucide="git-commit" class="w-4 h-4"></i>
-            </div>
-            <span class="text-xs font-semibold text-gray-200">Cabo Óptico</span>
-          </button>
-        </div>
-
-        <hr class="border-white/10 my-2" />
-
-        <!-- Status do Modo Ativo -->
-        <div id="mode-indicator" class="hidden bg-cyan-950/60 border border-cyan-500/30 p-3 rounded-xl flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i data-lucide="mouse-pointer-click" class="w-4 h-4 text-cyan-400 animate-bounce"></i>
-            <span class="text-xs text-cyan-200 font-medium" id="mode-text">Clique no mapa para adicionar...</span>
+          <div id="sub-olt" class="hidden pl-12 pr-4 py-1 space-y-1 text-xs text-slate-500">
+            <a href="#" class="block py-1.5 hover:text-teal-600">Listar OLTs</a>
+            <a href="#" class="block py-1.5 hover:text-teal-600">Cadastrar OLT</a>
           </div>
-          <button onclick="cancelAddMode()" class="text-xs text-gray-400 hover:text-white">Cancelar</button>
+        </div>
+
+        <!-- Item CTOs -->
+        <div class="group">
+          <button onclick="toggleSubmenu('sub-cto')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="box" class="w-5 h-5"></i>
+              <span>CTOs</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+          </button>
+          <div id="sub-cto" class="hidden pl-12 pr-4 py-1 space-y-1 text-xs text-slate-500">
+            <a href="#" class="block py-1.5 hover:text-teal-600">Ver todas</a>
+            <a href="#" class="block py-1.5 hover:text-teal-600">Ocupação de Portas</a>
+          </div>
+        </div>
+
+        <!-- Item CEOs -->
+        <div class="group">
+          <button onclick="toggleSubmenu('sub-ceo')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="wrench" class="w-5 h-5"></i>
+              <span>CEOs</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+          </button>
+        </div>
+
+        <!-- Item Cabos -->
+        <div class="group">
+          <button onclick="toggleSubmenu('sub-cabos')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="git-commit" class="w-5 h-5"></i>
+              <span>Cabos</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+          </button>
+        </div>
+
+        <!-- Item POPs -->
+        <div class="group">
+          <button onclick="toggleSubmenu('sub-pops')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="server" class="w-5 h-5"></i>
+              <span>POPs</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+          </button>
+        </div>
+
+      </nav>
+    </div>
+
+    <!-- BOTÃO SAIR -->
+    <div class="p-4 border-t border-slate-100">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-all font-medium text-sm">
+        <i data-lucide="log-out" class="w-5 h-5"></i>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+  <main class="flex-grow flex flex-col min-w-0 bg-slate-100">
+    
+    <!-- CABEÇALHO SUPERIOR (TÍTULO + CARDS DE MÉTRICAS + NAVEGAÇÃO DE ABAS) -->
+    <header class="p-6 pb-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Mapa da Rede</h1>
+      </div>
+
+      <!-- CARDS DE MÉTRICAS (IDENTICOS AO DA IMAGEM) -->
+      <div class="flex flex-wrap items-center gap-4">
+        
+        <!-- Metric Card 1 -->
+        <div class="bg-white border border-slate-200/80 rounded-2xl px-5 py-3.5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow min-w-[200px]">
+          <div class="w-11 h-11 rounded-xl bg-cyan-50 flex items-center justify-center text-cyan-500">
+            <i data-lucide="map-pin" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-slate-800 leading-none">0</div>
+            <div class="text-xs font-medium text-slate-400 mt-1">Áreas de Cobertura</div>
+          </div>
+        </div>
+
+        <!-- Metric Card 2 -->
+        <div class="bg-white border border-slate-200/80 rounded-2xl px-5 py-3.5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow min-w-[200px]">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
+            <i data-lucide="box" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-slate-800 leading-none">10</div>
+            <div class="text-xs font-medium text-slate-400 mt-1">CTOs no Mapa</div>
+          </div>
+        </div>
+
+        <!-- Metric Card 3 -->
+        <div class="bg-white border border-slate-200/80 rounded-2xl px-5 py-3.5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow min-w-[200px]">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+            <i data-lucide="users" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-slate-800 leading-none">20</div>
+            <div class="text-xs font-medium text-slate-400 mt-1">Clientes Conectados</div>
+          </div>
+        </div>
+
+        <!-- Abas no Canto Direiro Superior (Consulta / Cobertura) -->
+        <div class="bg-slate-200/60 p-1 rounded-2xl flex items-center gap-1 text-xs font-medium text-slate-600">
+          <button class="px-4 py-2 rounded-xl bg-white text-teal-600 font-semibold shadow-sm flex items-center gap-1.5">
+            <i data-lucide="crosshair" class="w-4 h-4 text-teal-500"></i> Consulta
+          </button>
+          <button class="px-4 py-2 rounded-xl hover:text-slate-900 flex items-center gap-1.5 transition-all">
+            <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i> Cobertura
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ÁREA DO MAPA + FLOATING SEARCH + DETALHES DA CTO -->
+    <div class="flex-grow mx-6 mb-6 relative rounded-3xl overflow-hidden border border-slate-200/80 shadow-md bg-white">
+      
+      <!-- MAPA INTERATIVO (LEAFLET) -->
+      <div id="map" class="w-full h-full z-0"></div>
+
+      <!-- BARRA DE PESQUISA FLUTUANTE SOBRE O MAPA -->
+      <div class="absolute top-4 left-4 z-10 w-full max-w-md">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-4 top-3.5 text-slate-400"></i>
+          <input type="text" placeholder="Digite o endereço para verificar viabilidade..." class="w-full bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl pl-11 pr-4 py-3 text-xs text-slate-700 shadow-lg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all" />
         </div>
       </div>
 
-      <!-- Conteúdo da Aba 2: Camadas do Mapa -->
-      <div id="content-layers" class="p-4 space-y-3 overflow-y-auto flex-grow hidden">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Elementos Visíveis</h4>
-        <label class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer">
-          <span class="text-xs font-medium text-gray-200 flex items-center gap-2"><i data-lucide="box" class="w-4 h-4 text-cyan-400"></i> Caixas CTO</span>
-          <input type="checkbox" checked onchange="toggleLayer('cto')" class="accent-cyan-500 w-4 h-4">
-        </label>
-        <label class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer">
-          <span class="text-xs font-medium text-gray-200 flex items-center gap-2"><i data-lucide="git-commit" class="w-4 h-4 text-blue-400"></i> Cabos Ópticos</span>
-          <input type="checkbox" checked onchange="toggleLayer('cables')" class="accent-cyan-500 w-4 h-4">
-        </label>
-        <label class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10 cursor-pointer">
-          <span class="text-xs font-medium text-gray-200 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-amber-400"></i> Clientes Conectados</span>
-          <input type="checkbox" checked onchange="toggleLayer('clients')" class="accent-cyan-500 w-4 h-4">
-        </label>
-      </div>
-
-      <!-- Conteúdo da Aba 3: Viabilidade -->
-      <div id="content-viability" class="p-4 space-y-4 overflow-y-auto flex-grow hidden">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Consulta de Viabilidade</h4>
-        <div class="space-y-2">
-          <label class="text-xs text-gray-300">Endereço do Cliente:</label>
-          <div class="relative">
-            <input type="text" id="address-input" placeholder="Rua, Número, Bairro..." class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 pr-8" />
-            <button onclick="checkViability()" class="absolute right-2 top-2 text-cyan-400 hover:text-cyan-300">
-              <i data-lucide="search" class="w-4 h-4"></i>
+      <!-- MODAL/PAINEL LATERAL DIREITO - DETALHES DA CTO (IGUAL AO PRINT) -->
+      <div id="cto-detail-modal" class="absolute top-4 right-4 z-20 w-80 max-h-[calc(100%-2rem)] bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xl flex flex-col justify-between overflow-y-auto">
+        <div>
+          <!-- Header do Modal -->
+          <div class="flex items-center justify-between mb-4">
+            <h3 id="cto-title" class="font-bold text-slate-800 text-base">CTO-007-AUGUSTA</h3>
+            <button onclick="closeCtoDetail()" class="text-slate-400 hover:text-slate-600 transition-colors">
+              <i data-lucide="x" class="w-5 h-5"></i>
             </button>
           </div>
-        </div>
-        <div id="viability-result" class="hidden p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-200 space-y-1">
-          <div class="font-bold flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> Viável para Instalação!</div>
-          <p class="text-gray-300 text-[11px]">CTO mais próxima: <strong>CTO-VMA-04</strong> (42 metros)</p>
-          <p class="text-gray-300 text-[11px]">Portas Livres: <strong>3 de 16</strong></p>
-        </div>
-      </div>
 
-      <!-- Rodapé da Sidebar -->
-      <div class="p-3 border-t border-white/10 bg-black/30 text-center">
-        <span class="text-[10px] text-gray-500 font-mono">WiaGeo v2.4.0 — Mapeamento GIS FTTH</span>
-      </div>
-    </aside>
-
-    <!-- CONTAINER DO MAPA LEAFLET -->
-    <main class="flex-grow relative bg-slate-900">
-      <div id="map" class="w-full h-full z-10"></div>
-
-      <!-- Painel Flutuante de CTO (Abrir ao clicar em uma CTO no mapa) -->
-      <div id="cto-panel" class="hidden absolute top-4 right-4 z-20 w-80 bg-brand-card/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl space-y-4">
-        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-          <div>
-            <span class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Caixa CTO</span>
-            <h3 id="panel-cto-name" class="font-heading font-bold text-white text-base">CTO-VMA-01</h3>
+          <!-- Informações de Endereço -->
+          <div class="mb-3">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Endereço</span>
+            <p id="cto-address" class="text-xs font-medium text-slate-700">EMENDA RETA R. FRANCISCO DE PAULA LAMAS</p>
           </div>
-          <button onclick="closeCtoPanel()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 flex items-center justify-center">
-            <i data-lucide="x" class="w-4 h-4"></i>
+
+          <!-- Grid Cidade e Potência -->
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Cidade</span>
+              <p class="text-xs font-semibold text-slate-700">Viamão</p>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Potência</span>
+              <p class="text-xs font-semibold text-slate-700">N/A dBm</p>
+            </div>
+          </div>
+
+          <!-- OLT Conectada -->
+          <div class="mb-4">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">OLT</span>
+            <p class="text-xs font-semibold text-slate-700">OLT-POP_ALEX-01</p>
+          </div>
+
+          <!-- Título das Portas e Badge de Ocupação -->
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-600">PORTAS (0/8)</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-bold text-[11px] flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 8/8 livres
+            </span>
+          </div>
+
+          <!-- Lista Vertical de Portas da CTO (Igual ao Print) -->
+          <div id="cto-ports-list" class="space-y-2 mb-6">
+            <!-- Gerado Dinamicamente via JS -->
+          </div>
+        </div>
+
+        <!-- Botões do Rodapé (Editar e Lixeira) -->
+        <div class="flex items-center gap-2 pt-2">
+          <button class="flex-grow bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md">
+            <i data-lucide="edit-3" class="w-4 h-4"></i> Editar
+          </button>
+          <button class="w-11 h-11 rounded-xl border border-rose-200 text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-all shrink-0">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <!-- Métrica da CTO -->
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
-            <span class="text-gray-400 block text-[10px]">Capacidade</span>
-            <span class="font-bold text-white text-sm">16 Portas</span>
-          </div>
-          <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
-            <span class="text-gray-400 block text-[10px]">Atenuação Estimada</span>
-            <span class="font-bold text-emerald-400 text-sm">-18.5 dBm</span>
-          </div>
-        </div>
-
-        <!-- Grid de Portas Splitter (1 a 16) -->
-        <div>
-          <span class="text-xs font-semibold text-gray-300 block mb-2">Ocupação das Portas:</span>
-          <div id="cto-ports-grid" class="grid grid-cols-4 gap-1.5">
-            <!-- Gerado via JavaScript -->
-          </div>
-        </div>
-
-        <button class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-          <i data-lucide="sliders" class="w-4 h-4"></i> Gerenciar Fusões & Clientes
-        </button>
       </div>
-    </main>
 
-  </div>
+    </div>
+  </main>
 
   <!-- JAVASCRIPT PRINCIPAL -->
   <script>
-    // 1. Configuração Inicial do Mapa Leaflet
-    // Coordenadas Iniciais (Viamão / Porto Alegre - RS)
+    // 1. Inicializando o Mapa com Tiles Light do CartoDB / OpenStreetMap
     const initialCoords = [-30.082, -51.024]; 
     const map = L.map('map', { zoomControl: false }).setView(initialCoords, 16);
 
-    // Adiciona camada do OpenStreetMap
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // TileLayer Claro e Limpo (Estilo Google / Carto Positron)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
       subdomains: 'abcd',
       maxZoom: 20
     }).addTo(map);
 
-    // Reposiciona o Controle de Zoom no Canto Inferior Direito
+    // Zoom no Canto Inferior Direito
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // 2. Estado Global da Aplicação
-    let currentAddMode = null;
-    let markers = [];
-    let cables = [];
-
-    // Dados Fictícios Iniciais da Rede
-    const initialElements = [
-      { id: 1, type: 'POP', name: 'POP Central WiaGeo', lat: -30.081, lng: -51.026, color: '#9333ea' },
-      { id: 2, type: 'CEO', name: 'CEO-VMA-01 (Emenda)', lat: -30.082, lng: -51.024, color: '#10b981' },
-      { id: 3, type: 'CTO', name: 'CTO-VMA-01', lat: -30.0825, lng: -51.022, color: '#06b6d4', ports: 16, occupied: 12 },
-      { id: 4, type: 'CTO', name: 'CTO-VMA-02', lat: -30.084, lng: -51.023, color: '#06b6d4', ports: 16, occupied: 5 },
+    // 2. Elementos Mapeados (CEOs e CTOs com as cores do Print)
+    const nodeElements = [
+      { id: 1, type: 'CEO', name: 'CEO-01', lat: -30.081, lng: -51.026, color: '#6366F1' },
+      { id: 2, type: 'CEO', name: 'CEO-02', lat: -30.082, lng: -51.025, color: '#6366F1' },
+      { id: 3, type: 'CEO', name: 'CEO-03', lat: -30.083, lng: -51.024, color: '#6366F1' },
+      { id: 4, type: 'CTO', name: 'CTO-007-AUGUSTA', lat: -30.0828, lng: -51.0232, color: '#10B981', ports: 8 },
+      { id: 5, type: 'CTO', name: 'CTO-008-AUGUSTA', lat: -30.0835, lng: -51.0225, color: '#10B981', ports: 8 },
+      { id: 6, type: 'POP', name: 'POP Central', lat: -30.0822, lng: -51.0228, color: '#EF4444' }
     ];
 
-    // Rota de Cabo Óptico
-    const cablePath = [
-      [-30.081, -51.026],
-      [-30.082, -51.024],
-      [-30.0825, -51.022]
-    ];
-
-    // Desenhar Cabo Inicial
-    const polyline = L.polyline(cablePath, { color: '#3b82f6', weight: 4, opacity: 0.8, dashArray: '6, 6' }).addTo(map);
-
-    // Renderizar Marcadores Iniciais
-    initialElements.forEach(item => addMarkerToMap(item));
-
-    // 3. Função para Criar Marcadores
-    function addMarkerToMap(item) {
+    // Renderizar Marcadores
+    nodeElements.forEach(item => {
       const customIcon = L.divIcon({
         className: 'custom-div-icon',
-        html: `<div class="custom-marker" style="background-color: ${item.color}; width: 28px; height: 28px;">
-                 <span style="font-size: 10px;">${item.type}</span>
+        html: `<div class="custom-node-pin" style="background-color: ${item.color}; width: 26px; height: 26px;">
+                 <span>${item.type}</span>
                </div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
       });
 
       const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
 
-      // Evento de Clique no Marcador
       marker.on('click', () => {
         if (item.type === 'CTO') {
-          openCtoPanel(item);
+          openCtoDetail(item);
         }
       });
-
-      // Tooltip no Hover
-      marker.bindTooltip(`<b>${item.name}</b>`, { permanent: false, direction: 'top' });
-    }
-
-    // 4. Lógica de Modos de Adição de Elementos
-    function setAddMode(type) {
-      currentAddMode = type;
-      document.getElementById('mode-indicator').classList.remove('hidden');
-      document.getElementById('mode-text').textContent = `Clique no mapa para posicionar ${type}...`;
-    }
-
-    function cancelAddMode() {
-      currentAddMode = null;
-      document.getElementById('mode-indicator').classList.add('hidden');
-    }
-
-    // Clique no Mapa para Adicionar Novo Elemento
-    map.on('click', (e) => {
-      if (!currentAddMode) return;
-
-      const colors = { CTO: '#06b6d4', CEO: '#10b981', POP: '#9333ea', CABLE: '#3b82f6' };
-      const newItem = {
-        id: Date.now(),
-        type: currentAddMode,
-        name: `${currentAddMode}-NOVO-${Math.floor(Math.random() * 100)}`,
-        lat: e.latlng.lat,
-        lng: e.latlng.lng,
-        color: colors[currentAddMode] || '#06b6d4'
-      };
-
-      addMarkerToMap(newItem);
-      cancelAddMode();
     });
 
-    // 5. Painel da CTO
-    function openCtoPanel(cto) {
-      document.getElementById('panel-cto-name').textContent = cto.name;
-      const grid = document.getElementById('cto-ports-grid');
-      grid.innerHTML = '';
+    // Renderizar Portas da CTO Verticalmente no Painel
+    function openCtoDetail(cto) {
+      document.getElementById('cto-title').textContent = cto.name;
+      const listContainer = document.getElementById('cto-ports-list');
+      listContainer.innerHTML = '';
 
-      const totalPorts = cto.ports || 16;
-      const occupied = cto.occupied || 8;
+      const totalPorts = cto.ports || 8;
 
       for (let i = 1; i <= totalPorts; i++) {
-        const isOccupied = i <= occupied;
-        const portBtn = document.createElement('div');
-        portBtn.className = `h-7 rounded-md flex items-center justify-center font-mono text-[10px] font-bold border ${
-          isOccupied 
-            ? 'bg-rose-500/20 border-rose-500/40 text-rose-300' 
-            : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 cursor-pointer hover:bg-emerald-500/40'
-        }`;
-        portBtn.textContent = i < 10 ? `0${i}` : i;
-        grid.appendChild(portBtn);
+        const portItem = document.createElement('div');
+        portItem.className = 'flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-2.5';
+        portItem.innerHTML = `
+          <div class="w-6 h-6 rounded-md bg-slate-200/80 font-semibold text-slate-600 text-xs flex items-center justify-center font-mono">
+            ${i}
+          </div>
+          <span class="text-xs font-medium text-slate-400">Livre</span>
+        `;
+        listContainer.appendChild(portItem);
       }
 
-      document.getElementById('cto-panel').classList.remove('hidden');
+      document.getElementById('cto-detail-modal').classList.remove('hidden');
     }
 
-    function closeCtoPanel() {
-      document.getElementById('cto-panel').classList.add('hidden');
+    function closeCtoDetail() {
+      document.getElementById('cto-detail-modal').classList.add('hidden');
     }
 
-    // 6. Troca de Abas da Sidebar
-    function switchTab(tab) {
-      ['add', 'layers', 'viability'].forEach(t => {
-        document.getElementById(`content-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).classList.remove('text-cyan-400', 'border-cyan-400');
-        document.getElementById(`tab-${t}`).classList.add('border-transparent');
-      });
-
-      document.getElementById(`content-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).classList.add('text-cyan-400', 'border-cyan-400');
-    }
-
-    // 7. Simulação de Viabilidade
-    function checkViability() {
-      const input = document.getElementById('address-input').value;
-      if (input.trim() !== '') {
-        document.getElementById('viability-result').classList.remove('hidden');
+    // Toggle para Submenus Sanfonados da Sidebar
+    function toggleSubmenu(id) {
+      const sub = document.getElementById(id);
+      if (sub) {
+        sub.classList.toggle('hidden');
       }
     }
 
     // Inicialização dos Ícones Lucide
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
+      openCtoDetail(nodeElements[3]); // Abre a CTO de exemplo por padrão
     });
   </script>
 </body>
