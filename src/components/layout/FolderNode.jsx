@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ChevronDown, ChevronRight, FolderPlus, Pencil, Trash2 } from "lucide-react";
 import { api } from "@/api/apiClient";
 import SidebarStatusBadges from "./SidebarStatusBadges";
+import { useClickVsDrag } from "@/hooks/useClickVsDrag";
 
 const COLORS = [
   { dot: "bg-[#00C7D9]", text: "text-[#00A8BD]", hover: "hover:bg-[#E0F7FA]" },
@@ -141,23 +142,43 @@ export default function FolderNode({ folder, folders, items, depth, tipoItem, en
             />
           ))}
           {childItems.map((item) => (
-            <div
+            <ItemRow
               key={item.id}
-              draggable
-              onDragStart={(e) => { e.dataTransfer.setData("text/plain", JSON.stringify({ itemId: item.id })); e.dataTransfer.effectAllowed = "move"; }}
-              onClick={() => onItemClick(item)}
-              className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs text-gray-600 ${color.hover} transition-colors text-left cursor-grab active:cursor-grabbing ${item.id === selectedId ? "bg-[#E0F7FA] text-[#00A8BD] ring-1 ring-[#00C7D9] font-semibold" : ""}`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${color.dot} flex-shrink-0`} />
-              <span className="truncate flex-1">{item[nameField] || "Sem nome"}</span>
-              {isCto && statusMap?.[item.id] && <SidebarStatusBadges counts={statusMap[item.id]} />}
-            </div>
+              item={item}
+              nameField={nameField}
+              color={color}
+              selectedId={selectedId}
+              isCto={isCto}
+              statusMap={statusMap}
+              onItemClick={onItemClick}
+            />
           ))}
           {childFolders.length === 0 && childItems.length === 0 && !creating && (
             <p className="text-[10px] text-gray-300 px-2 py-1">Arraste itens aqui</p>
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// Linha de um item (CTO/CEO/Cabo/etc) dentro de uma pasta: arrastável (pra
+// mover entre pastas) e clicável (pra abrir o painel de detalhes) sem os dois
+// gestos brigarem entre si — ver useClickVsDrag.
+function ItemRow({ item, nameField, color, selectedId, isCto, statusMap, onItemClick }) {
+  const { onMouseDown, onMouseUp } = useClickVsDrag(() => onItemClick(item));
+
+  return (
+    <div
+      draggable
+      onDragStart={(e) => { e.dataTransfer.setData("text/plain", JSON.stringify({ itemId: item.id })); e.dataTransfer.effectAllowed = "move"; }}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs text-gray-600 ${color.hover} transition-colors text-left cursor-grab active:cursor-grabbing ${item.id === selectedId ? "bg-[#E0F7FA] text-[#00A8BD] ring-1 ring-[#00C7D9] font-semibold" : ""}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${color.dot} flex-shrink-0`} />
+      <span className="truncate flex-1">{item[nameField] || "Sem nome"}</span>
+      {isCto && statusMap?.[item.id] && <SidebarStatusBadges counts={statusMap[item.id]} />}
     </div>
   );
 }
