@@ -4,6 +4,7 @@ import { Loader2, FolderPlus } from "lucide-react";
 import FolderNode from "./FolderNode";
 import SidebarStatusBadges from "./SidebarStatusBadges";
 import { useMkauthStatus } from "@/hooks/useMkauthStatus";
+import { useClickVsDrag } from "@/hooks/useClickVsDrag";
 
 export default function FolderSection({ tipoItem, entity, nameField, selectedId, onItemClick }) {
   const [folders, setFolders] = useState([]);
@@ -130,17 +131,15 @@ export default function FolderSection({ tipoItem, entity, nameField, selectedId,
         <div className={`pt-1 ${rootFolders.length > 0 ? "mt-1 border-t border-border" : ""}`}>
           {rootFolders.length > 0 && <p className="text-[10px] text-gray-400 px-2 py-1 font-medium">Sem pasta</p>}
           {unfiledItems.map((item) => (
-            <div
+            <UnfiledItemRow
               key={item.id}
-              draggable
-              onDragStart={(e) => { e.dataTransfer.setData("text/plain", JSON.stringify({ itemId: item.id })); e.dataTransfer.effectAllowed = "move"; }}
-              onClick={() => onItemClick(item)}
-              className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs text-gray-600 hover:bg-[#E0F7FA] hover:text-[#00A8BD] transition-colors text-left cursor-grab active:cursor-grabbing ${item.id === selectedId ? "bg-[#E0F7FA] text-[#00A8BD] ring-1 ring-[#00C7D9] font-semibold" : ""}`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
-              <span className="truncate flex-1">{item[nameField] || "Sem nome"}</span>
-              {isCto && statusMap[item.id] && <SidebarStatusBadges counts={statusMap[item.id]} />}
-            </div>
+              item={item}
+              nameField={nameField}
+              selectedId={selectedId}
+              isCto={isCto}
+              statusMap={statusMap}
+              onItemClick={onItemClick}
+            />
           ))}
         </div>
       )}
@@ -148,6 +147,26 @@ export default function FolderSection({ tipoItem, entity, nameField, selectedId,
       {rootFolders.length === 0 && unfiledItems.length === 0 && !creating && (
         <p className="text-xs text-gray-400 px-2 py-3">Nenhum item cadastrado</p>
       )}
+    </div>
+  );
+}
+
+// Mesma lógica de clique-vs-arraste do FolderNode.jsx, aqui pros itens que
+// ainda não estão em nenhuma pasta.
+function UnfiledItemRow({ item, nameField, selectedId, isCto, statusMap, onItemClick }) {
+  const { onMouseDown, onMouseUp } = useClickVsDrag(() => onItemClick(item));
+
+  return (
+    <div
+      draggable
+      onDragStart={(e) => { e.dataTransfer.setData("text/plain", JSON.stringify({ itemId: item.id })); e.dataTransfer.effectAllowed = "move"; }}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-xs text-gray-600 hover:bg-[#E0F7FA] hover:text-[#00A8BD] transition-colors text-left cursor-grab active:cursor-grabbing ${item.id === selectedId ? "bg-[#E0F7FA] text-[#00A8BD] ring-1 ring-[#00C7D9] font-semibold" : ""}`}
+    >
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
+      <span className="truncate flex-1">{item[nameField] || "Sem nome"}</span>
+      {isCto && statusMap[item.id] && <SidebarStatusBadges counts={statusMap[item.id]} />}
     </div>
   );
 }
