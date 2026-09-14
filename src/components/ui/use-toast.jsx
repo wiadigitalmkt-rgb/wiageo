@@ -2,7 +2,10 @@
 import { useState, useEffect } from "react";
 
 const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 1000000;
+// Tempo que o toast fica visível antes de sumir sozinho.
+const DEFAULT_TOAST_DURATION = 4000;
+// Tempo entre "fechar" (fade-out) e remover de vez do DOM — só a animação.
+const TOAST_REMOVE_DELAY = 1000;
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -36,6 +39,20 @@ const addToRemoveQueue = (toastId) => {
   toastTimeouts.set(toastId, timeout);
 };
 
+// Agenda o auto-dismiss (fechar sozinho) de um toast recém-criado.
+const autoDismissTimeouts = new Map();
+const scheduleAutoDismiss = (toastId, duration) => {
+  if (duration === Infinity) return; // toast.duration = Infinity => fica até clicar no X
+  if (autoDismissTimeouts.has(toastId)) {
+    clearTimeout(autoDismissTimeouts.get(toastId));
+  }
+  const timeout = setTimeout(() => {
+    autoDismissTimeouts.delete(toastId);
+    dispatch({ type: actionTypes.DISMISS_TOAST, toastId });
+  }, duration ?? DEFAULT_TOAST_DURATION);
+  autoDismissTimeouts.set(toastId, timeout);
+};
+
 const _clearFromRemoveQueue = (toastId) => {
   const timeout = toastTimeouts.get(toastId);
   if (timeout) {
@@ -67,6 +84,10 @@ export const reducer = (state, action) => {
       // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId);
+        if (autoDismissTimeouts.has(toastId)) {
+          clearTimeout(autoDismissTimeouts.get(toastId));
+          autoDismissTimeouts.delete(toastId);
+        }
       } else {
         state.toasts.forEach((toast) => {
           addToRemoveQueue(toast.id);
@@ -134,6 +155,10 @@ function toast({ ...props }) {
     },
   });
 
+  // Some cases (errors, confirmações importantes) podem passar
+  // `toast({ ..., duration: Infinity })` pra exigir fechamento manual.
+  scheduleAutoDismiss(id, props.duration);
+
   return {
     id,
     dismiss,
@@ -161,4 +186,4 @@ function useToast() {
   };
 }
 
-export { useToast, toast }; 
+export { useToast, toast };
