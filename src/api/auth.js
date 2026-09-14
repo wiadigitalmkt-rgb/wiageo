@@ -62,22 +62,21 @@ async function resendOtp(email) {
 }
 
 async function resetPasswordRequest(email) {
-  // O template de e-mail "Reset Password" no painel Supabase precisa apontar para:
-  //   {{ .SiteURL }}/reset-password?token={{ .TokenHash }}
+  // Usa o e-mail/link padrão do Supabase (sem precisar customizar o template):
+  // o link do "Reset your password" já embute os tokens de sessão e o Supabase
+  // JS client (detectSessionInUrl: true) os captura sozinho ao abrir /reset-password.
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reset-password`,
   });
   if (error) throw error;
 }
 
-async function resetPassword({ resetToken, newPassword }) {
-  const { error: verifyError } = await supabase.auth.verifyOtp({
-    token_hash: resetToken,
-    type: 'recovery',
-  });
-  if (verifyError) throw verifyError;
-  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
-  if (updateError) throw updateError;
+async function resetPassword({ newPassword }) {
+  // A sessão de recuperação já foi estabelecida pelo supabase-js ao carregar
+  // a página (a partir do #access_token=...&type=recovery na URL do link do
+  // e-mail) — aqui só falta trocar a senha nessa sessão.
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
 }
 
 async function logout(returnUrl) {
