@@ -77,17 +77,19 @@ export default function FolderNode({ folder, folders, items, depth, tipoItem, en
         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
-        className={`flex items-center gap-1 w-full px-2 py-1.5 rounded-lg ${color.hover} transition-all group ${dragOver ? "ring-2 ring-[#00C7D9] bg-[#E0F7FA]" : ""}`}
+        onClick={() => setExpanded(!expanded)}
+        className={`flex items-center gap-1 w-full px-2 py-1.5 rounded-lg cursor-pointer ${color.hover} transition-all group ${dragOver ? "ring-2 ring-[#00C7D9] bg-[#E0F7FA]" : ""}`}
       >
-        <button onClick={() => setExpanded(!expanded)} className="flex-shrink-0">
+        <span className="flex-shrink-0 pointer-events-none">
           {expanded ? <ChevronDown className="w-3.5 h-3.5 text-gray-400" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-400" />}
-        </button>
+        </span>
         <span className={`w-2 h-2 rounded-full ${color.dot} flex-shrink-0`} />
         {renaming ? (
           <input
             autoFocus
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => { if (e.key === "Enter") handleRename(); if (e.key === "Escape") { setRenaming(false); setEditName(folder.nome); } }}
             onBlur={handleRename}
             className="flex-1 px-1 text-xs border border-[#00C7D9] rounded outline-none bg-white min-w-0"
